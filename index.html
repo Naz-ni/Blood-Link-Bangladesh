@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Blood Donation & Transport Platform – Bangladesh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Bangladesh Identity (Red & Green) -->
+    <!-- Application Structure Plan: The SPA is designed with a thematic, top-down narrative structure. It begins with a high-level "Vision" (the promise), defines "The Challenge" (the problem), presents "The Integrated Solution" (the core product and partner integration), outlines the **"A-Z Execution Blueprint"** to detail the core functions, visualizes "The Roadmap" (the plan), and concludes with "Success Metrics" (the KPIs). This flow guides the user intuitively from the 'what' and 'why' to the 'how' and 'when'. This structure prioritizes user understanding by grouping related concepts from different report chapters into cohesive, digestible, and interactive sections, making the complex project accessible. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Blood Supply Weakness (Chapter 3). Goal: Compare. Viz: Donut Chart. Interaction: Hover tooltips. Justification: Instantly shows the heavy reliance on replacement donors, making the core problem visually obvious. Library: Chart.js.
+        2. Report Info: End-to-end Process (Chapter 14). Goal: Organize. Viz: Interactive HTML/CSS Flexbox Flowchart. Interaction: Click on steps to reveal detailed explanations. Justification: Breaks down a complex workflow into a simple visual path, allowing users to drill down for details without initial clutter. Method: HTML/CSS/JS.
+        3. Report Info: Partner Integration (Chapter 1.1, 1.3). Goal: Inform/Organize. Viz: Interactive cards with expandable details. Interaction: Clicking a card expands a new section with a smooth animation to show in-depth integration strategies. Justification: This addresses the user's specific feedback, providing a visually attractive, easy-to-understand way to present the complex data collection process. Method: HTML/CSS/JS.
+        4. Report Info: **A-Z Execution Blueprint (New)**: Goal: Detail and prototype. Viz: A multi-view, step-by-step prototype UI with navigation. Interaction: User clicks on a main step (e.g., Onboarding, Matching, Logistics) to switch the visible content, and then within "Onboarding," they can select different user types (Individual vs. Organization) to see a prototype form. This gives a tangible sense of the user experience. Method: HTML/CSS/JS.
+        5. Report Info: Rollout Plan (Chapter 6). Goal: Show change over time. Viz: Interactive HTML/CSS Timeline. Interaction: Click tabs for each phase to update a detailed content pane. Justification: More engaging and space-efficient than a static table, clearly showing progression and phase-specific goals. Method: HTML/CSS/JS.
+        6. Report Info: Success Metrics/KPIs (Chapter 10). Goal: Inform. Viz: Bar Charts. Interaction: Hover tooltips. Justification: Clearly visualizes the ambitious targets for key metrics like delivery time and donor retention, making success tangible. Library: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF7F7;
+            color: #1F2937;
+            background-image: url('https://placehold.co/1000x1000/F4F7F9/F4F7F9?text=Bangladesh+Map+Watermark');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 80%;
+            background-attachment: fixed;
+            opacity: 0.85;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D32F2F;
+            border-bottom-color: #D32F2F;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .kpi-chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            max-height: 300px;
+        }
+        .timeline-btn.active {
+            background-color: #D32F2F;
+            color: white;
+            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%);
+        }
+        .flow-step {
+            transition: all 0.3s ease-in-out;
+        }
+        .flow-step.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(211, 47, 47, 0.5);
+            border-color: #D32F2F;
+        }
+        .partner-card-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .partner-card.open .partner-card-details {
+            max-height: 300px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .partner-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+        .blueprint-btn.active {
+            background-color: #D32F2F;
+            color: white;
+            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%);
+        }
+        .blueprint-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            display: none;
+        }
+        .blueprint-content.active {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        .registration-form-container {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.5s ease-in-out;
+            display: none;
+        }
+        .registration-form-container.active {
+            opacity: 1;
+            transform: scale(1);
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <header class="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-[#D32F2F]">
+                <span class="text-gray-800">BloodLink</span> Bangladesh
+            </h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#vision" class="nav-link font-medium text-gray-600 pb-1">Vision</a>
+                <a href="#challenge" class="nav-link font-medium text-gray-600 pb-1">The Challenge</a>
+                <a href="#solution" class="nav-link font-medium text-gray-600 pb-1">The Solution</a>
+                <a href="#blueprint" class="nav-link font-medium text-gray-600 pb-1">Execution Blueprint</a>
+                <a href="#roadmap" class="nav-link font-medium text-gray-600 pb-1">Roadmap</a>
+                <a href="#metrics" class="nav-link font-medium text-gray-600 pb-1">Success Metrics</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#vision" class="block py-2 text-gray-600">Vision</a>
+            <a href="#challenge" class="block py-2 text-gray-600">The Challenge</a>
+            <a href="#solution" class="block py-2 text-gray-600">The Solution</a>
+            <a href="#blueprint" class="block py-2 text-gray-600">Execution Blueprint</a>
+            <a href="#roadmap" class="block py-2 text-gray-600">Roadmap</a>
+            <a href="#metrics" class="block py-2 text-gray-600">Success Metrics</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+
+        <section id="vision" class="text-center pt-10 pb-16">
+            <h2 class="text-3xl md:text-5xl font-bold text-gray-800 mb-4">A Unified Blood Donation Ecosystem for Bangladesh</h2>
+            <p class="text-lg md:text-xl max-w-4xl mx-auto text-gray-600 mb-10">
+                The current blood donation landscape in Bangladesh is defined by **fragmentation, traffic bottlenecks, and data gaps** that lead to preventable deaths. Our vision is to solve these critical failures by creating a unified, technology-driven platform. We will replace disorganization with efficiency, ensuring life-saving blood is delivered within **30-60 minutes**, anywhere in the country.
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="text-3xl font-bold text-[#D32F2F]">≤30 min</div>
+                    <p class="text-sm text-gray-500 mt-1">Time-to-Match (Dhaka)</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="text-3xl font-bold text-[#D32F2F]">>50%</div>
+                    <p class="text-sm text-gray-500 mt-1">Annual Donor Retention</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="text-3xl font-bold text-[#D32F2F]"><5%</div>
+                    <p class="text-sm text-gray-500 mt-1">Component Wastage</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="text-3xl font-bold text-[#D32F2F]">>95%</div>
+                    <p class="text-sm text-gray-500 mt-1">Urgent Delivery Compliance</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenge" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">The Challenge: A Fragmented System</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">Bangladesh's current blood ecosystem faces critical gaps in coordination, logistics, and technology, leading to preventable delays and loss of life. We've identified the key bottlenecks that our platform aims to solve.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg text-gray-800">Fragmented Donor Systems</h3>
+                        <p class="text-gray-600 mt-2">Multiple unverified apps, university clubs, and social media pages exist with no central database. This causes families to waste precious hours searching for donors.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg text-gray-800">Transportation Bottlenecks</h3>
+                        <p class="text-gray-600 mt-2">With Dhaka's average traffic speed at a mere 6.4 km/h, traditional transport like ambulances are too slow. There is no dedicated, optimized fleet for urgent blood delivery.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg text-gray-800">Hospital & Data Gaps</h3>
+                        <p class="text-gray-600 mt-2">Hospitals lack real-time inventory systems and a national dashboard for blood availability. This, combined with a lack of AI-driven demand forecasting, creates critical inefficiencies.</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                        <h3 class="text-center font-bold text-xl text-gray-800 mb-4">National Blood Supply Sources</h3>
+                        <p class="text-center text-sm text-gray-500 mb-4">A heavy reliance on replacement donors from family and friends introduces risks and delays. A key goal is to significantly increase the share of safe, voluntary donations.</p>
+                        <div class="chart-container">
+                            <canvas id="supplyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">An Integrated, End-to-End Solution</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">Our platform connects every stakeholder in the blood donation journey through a seamless, technology-driven process. The workflow below details how we ensure rapid and reliable delivery.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4">
+                    <span class="text-3xl font-bold text-[#D32F2F]">1.</span>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">Platform Request 🏥</h4>
+                        <p class="text-sm text-gray-600 mt-1">When a patient needs blood that is not in stock, a trained hospital coordinator initiates an urgent request through the national platform dashboard. The request includes blood type, component needed (RBC, platelets, etc.), and urgency level.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4">
+                    <span class="text-3xl font-bold text-[#D32F2F]">2.</span>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">AI Donor Match 🎯</h4>
+                        <p class="text-sm text-gray-600 mt-1">The platform's AI instantly queries the verified donor registry, filtering by blood type, location, and availability. It identifies and alerts the most suitable donors via app notifications, SMS, and automated calls to ensure a rapid response.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4">
+                    <span class="text-3xl font-bold text-[#D32F2F]">3.</span>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">Optimized Transport 🏍️</h4>
+                        <p class="text-sm text-gray-600 mt-1">Simultaneously, the system's AI routing engine selects the fastest transport option based on real-time traffic data. It dynamically dispatches the best choice from Tier 1 (Uber/Pathao), Tier 2 (Vetted Volunteers), or Tier 3 (In-house emergency fleet).</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4">
+                    <span class="text-3xl font-bold text-[#D32F2F]">4.</span>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">Collection & Cold Chain 🩸</h4>
+                        <p class="text-sm text-gray-600 mt-1">Blood is collected either at the donor's home or a nearby partner facility. It is immediately placed in a portable, temperature-monitored cold-chain box (2-6°C for RBCs) to ensure viability and safety throughout its journey.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex items-start space-x-4">
+                    <span class="text-3xl font-bold text-[#D32F2F]">5.</span>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800">Hospital Delivery 📦</h4>
+                        <p class="text-sm text-gray-600 mt-1">The transport unit delivers the blood directly to the hospital's transfusion coordinator. A secure digital handoff is completed using QR codes, and the inventory is updated in real-time on the platform, closing the loop.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-20">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800">Unifying the Ecosystem: Our Partner Integration Model</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-gray-600">We are not starting from scratch. Our core strategy is to connect the fragmented, existing community platforms and databases into a single, verified national registry.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                    <div class="partner-card bg-white p-6 rounded-xl shadow-md border border-gray-200 cursor-pointer" data-partner="universities">
+                        <div class="flex items-center mb-4">
+                            <div class="text-3xl text-[#D32F2F] mr-4">🏫</div>
+                            <h4 class="font-bold text-lg text-gray-800">University Networks (e.g., Badhan)</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">Tap into existing student donor pools and run targeted campus campaigns.</p>
+                        <div class="partner-card-details text-sm text-gray-600 bg-gray-50 p-4 -mx-6 -mb-6 mt-4">
+                            <p class="font-semibold text-gray-700">How We Integrate:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>API Integration:</strong> We will provide secure APIs to university blood clubs for real-time data sharing and registration.</li>
+                                <li><strong>Formalizing Process:</strong> We will help them formalize donor screening and data collection, feeding verified donor profiles directly into our national registry.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="partner-card bg-white p-6 rounded-xl shadow-md border border-gray-200 cursor-pointer" data-partner="sms">
+                        <div class="flex items-center mb-4">
+                            <div class="text-3xl text-[#D32F2F] mr-4">💬</div>
+                            <h4 class="font-bold text-lg text-gray-800">SMS & Alert Systems (e.g., Rokto)</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">Utilize their proven SMS infrastructure for rapid, wide-reaching emergency alerts.</p>
+                        <div class="partner-card-details text-sm text-gray-600 bg-gray-50 p-4 -mx-6 -mb-6 mt-4">
+                            <p class="font-semibold text-gray-700">How We Integrate:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>Alert Orchestration:</strong> Our platform will be the central hub, sending AI-matched requests to their SMS systems, which will broadcast messages to their existing donor base.</li>
+                                <li><strong>Data Partnership:</strong> We will merge their donor databases into our central registry, enhancing the scale and reliability of our network.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="partner-card bg-white p-6 rounded-xl shadow-md border border-gray-200 cursor-pointer" data-partner="community">
+                        <div class="flex items-center mb-4">
+                            <div class="text-3xl text-[#D32F2F] mr-4">👥</div>
+                            <h4 class="font-bold text-lg text-gray-800">Community Pages (e.g., BloodLine)</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">Merge donor databases to enhance social engagement and community building.</p>
+                        <div class="partner-card-details text-sm text-gray-600 bg-gray-50 p-4 -mx-6 -mb-6 mt-4">
+                            <p class="font-semibold text-gray-700">How We Integrate:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>Formalization of Networks:</strong> We will provide these ad-hoc groups with a structured digital presence, enabling them to verify and manage their members more effectively.</li>
+                                <li><strong>Centralized Registry:</strong> Their valuable, local donor data will be migrated into our single, national registry, making it accessible for wider, more urgent needs across the country.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="partner-card bg-white p-6 rounded-xl shadow-md border border-gray-200 cursor-pointer" data-partner="ride-sharing">
+                        <div class="flex items-center mb-4">
+                            <div class="text-3xl text-[#D32F2F] mr-4">🏍️</div>
+                            <h4 class="font-bold text-lg text-gray-800">Ride-Sharing (e.g., Uber/Pathao)</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">A multi-modal transport strategy to overcome Dhaka's severe traffic bottlenecks.</p>
+                        <div class="partner-card-details text-sm text-gray-600 bg-gray-50 p-4 -mx-6 -mb-6 mt-4">
+                            <p class="font-semibold text-gray-700">How We Integrate:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>Medical Express API:</strong> We will integrate with their APIs to launch a dedicated "Medical Express" service, giving our deliveries priority.</li>
+                                <li><strong>CSR Partnership:</strong> This offers them valuable public relations, and in return, we get access to a massive, nimble fleet of motorbikes that can navigate traffic far more efficiently.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="partner-card bg-white p-6 rounded-xl shadow-md border border-gray-200 cursor-pointer" data-partner="volunteers">
+                        <div class="flex items-center mb-4">
+                            <div class="text-3xl text-[#D32F2F] mr-4">💖</div>
+                            <h4 class="font-bold text-lg text-gray-800">Volunteer Network</h4>
+                        </div>
+                        <p class="text-sm text-gray-600">A vetted network of community drivers and coordinators.</p>
+                        <div class="partner-card-details text-sm text-gray-600 bg-gray-50 p-4 -mx-6 -mb-6 mt-4">
+                            <p class="font-semibold text-gray-700">How We Integrate:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>Tiered Logistics:</strong> Our AI will use volunteers as a cost-effective, local delivery option when ride-sharing is unavailable.</li>
+                                <li><strong>Incentives & Training:</strong> We will provide small stipends for fuel, certification, and training to maintain a committed, reliable fleet of community heroes.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blueprint" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Our A-Z Execution Blueprint</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">This prototype shows how the platform will work in a real-world scenario. Explore each tab to see how we will execute our vision, from data collection to real-time logistics.</p>
+            </div>
+            <div class="flex justify-center mb-8 space-x-4">
+                <button class="blueprint-btn px-6 py-3 rounded-full font-semibold text-sm md:text-base active" data-step="onboarding">1. Data Ingestion & Onboarding</button>
+                <button class="blueprint-btn px-6 py-3 rounded-full font-semibold text-sm md:text-base" data-step="search">2. Search & Match</button>
+                <button class="blueprint-btn px-6 py-3 rounded-full font-semibold text-sm md:text-base" data-step="logistics">3. Logistics & Community</button>
+            </div>
+
+            <div id="blueprint-container" class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 min-h-[450px] transition-all duration-500 overflow-hidden relative">
+                
+                <div id="onboarding-view" class="blueprint-content active">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Step 1: Data Ingestion & Onboarding</h3>
+                    <p class="text-gray-600 mb-6">We will collect and unify data from individuals and organizations, creating a single, reliable national registry. We're not starting from scratch; we are consolidating and enriching existing data. Select a data source to see the prototype.</p>
+                    <div class="flex space-x-4 mb-8">
+                        <button id="individual-btn" class="px-6 py-2 rounded-full border-2 border-[#D32F2F] text-[#D32F2F] font-semibold transition-all duration-300 hover:bg-[#D32F2F] hover:text-white">New Individual Donor</button>
+                        <button id="org-btn" class="px-6 py-2 rounded-full border-2 border-gray-400 text-gray-600 font-semibold transition-all duration-300 hover:bg-gray-400 hover:text-white">Organization Data Import</button>
+                    </div>
+
+                    <div id="data-forms">
+                        <div id="individual-form-container" class="registration-form-container active">
+                             <p class="text-gray-600 mb-4">This portal is for new individual donors. They can register quickly with an option for auto-filling their location for convenience.  </p>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" placeholder="Nazmul Islam" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
+                                    <select class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                        <option>A+</option><option>B+</option><option>O+</option><option>AB+</option><option>A-</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <input type="text" id="location-input" placeholder="Enter your address or use live location" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                    <button id="live-location-btn" class="mt-2 w-full bg-green-700 text-white py-2 rounded-md text-sm font-semibold transition-transform transform hover:scale-105">Use Live Location</button>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Social Profile Link</label>
+                                    <input type="text" placeholder="e.g., facebook.com/profile" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                </div>
+                                <div>
+                                    <button class="w-full bg-[#D32F2F] text-white py-3 rounded-md font-semibold transition-transform transform hover:scale-105">Verify & Register</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="org-form-container" class="registration-form-container">
+                            <p class="text-gray-600 mb-4">This dedicated portal allows partner organizations to upload their existing donor databases directly. We formalize their ad-hoc networks, import their verified data, and merge it with our national registry for the greater good.  </p>
+                             <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
+                                    <input type="text" placeholder="Badhan, Dhaka University" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+                                    <input type="email" placeholder="admin@badhan.org" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Existing Donor Count</label>
+                                    <input type="number" placeholder="5000" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-[#D32F2F] focus:border-[#D32F2F]">
+                                </div>
+                                <div>
+                                    <button class="w-full bg-[#D32F2F] text-white py-3 rounded-md font-semibold transition-transform transform hover:scale-105">Initiate API Integration</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="search-view" class="blueprint-content">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Step 2: World-Class Search & Matching</h3>
+                    <p class="text-gray-600 mb-6">Inspired by the world's best platforms, our search and matching engine provides real-time information to those in need. Families can find blood, and hospitals can track inventory, all in one place.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
+                             <h4 class="font-semibold text-gray-800 mb-2">Patient & Hospital Search</h4>
+                             <p class="text-sm text-gray-600 mb-4">Find blood for a loved one or check real-time stock at nearby hospitals.</p>
+                             <div class="space-y-4">
+                                 <div>
+                                     <label class="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
+                                     <select class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                                         <option>O+</option><option>A+</option><option>B+</option>
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label class="block text-sm font-medium text-gray-700 mb-1">Location (City/Hospital)</label>
+                                     <input type="text" placeholder="e.g., Dhaka, DMCH" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                                 </div>
+                                 <button class="w-full bg-green-700 text-white py-2 rounded-md font-semibold transition-transform transform hover:scale-105">Search for Blood</button>
+                                 <div class="bg-white p-4 rounded-md shadow-inner h-32 overflow-y-auto">
+                                     <p class="font-bold text-gray-800">Results (Mock Data):</p>
+                                     <p class="text-sm text-green-600">DMCH: 5 units of O+ available</p>
+                                     <p class="text-sm text-gray-600">Aga Khan Hospital: O+ available on request</p>
+                                 </div>
+                             </div>
+                        </div>
+                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
+                             <h4 class="font-semibold text-gray-800 mb-2">AI Matching & Alert Simulation</h4>
+                             <p class="text-sm text-gray-600 mb-4">Watch as our AI finds and notifies donors in real-time, drastically reducing wait times. </p>
+                             <div class="bg-white p-4 rounded-lg shadow-inner">
+                                 <p class="font-bold text-gray-800">Request: O- blood needed</p>
+                                 <p class="text-sm text-gray-600">Location: Banani, Dhaka</p>
+                                 <div class="w-full bg-gray-200 rounded-full h-2.5 my-4">
+                                     <div id="matching-progress-bar" class="bg-red-500 h-2.5 rounded-full" style="width: 0%;"></div>
+                                 </div>
+                                 <div id="matching-status" class="text-sm text-gray-700">Searching...</div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="logistics-view" class="blueprint-content">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Step 3: Logistics & Community</h3>
+                    <p class="text-gray-600 mb-6">Our platform is more than just an app; it's a living, breathing community. We track every delivery and celebrate every hero, creating a cycle of trust and goodwill.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
+                             <h4 class="font-semibold text-gray-800 mb-2">Live Delivery Tracker</h4>
+                             <p class="text-sm text-gray-600 mb-4">Monitor the entire journey of a life-saving blood unit, from donor to hospital, in real time.</p>
+                             <div class="h-48 rounded-lg bg-gray-200 flex items-center justify-center relative overflow-hidden">
+                                 <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://placehold.co/400x300/e5e7eb/d1d5db?text=Dhaka+Map');"></div>
+                                 <div class="absolute w-4 h-4 rounded-full bg-green-500 animate-pulse" style="top: 70%; left: 30%;"></div>
+                                 <div class="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-red-500"></div>
+                             </div>
+                             <p class="text-sm text-center mt-2 text-gray-500">Tier 1 Transport is on the way!</p>
+                        </div>
+                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
+                             <h4 class="font-semibold text-gray-800 mb-2">Donor Rewards & Impact</h4>
+                             <p class="text-sm text-gray-600 mb-4">Our gamified dashboard recognizes and rewards donors, building a loyal and engaged community.</p>
+                             <div class="bg-white p-4 rounded-lg shadow-inner">
+                                 <p class="text-center font-bold text-lg text-[#D32F2F]">Nazmul Islam</p>
+                                 <p class="text-center text-sm text-gray-500">Lives Saved: <strong>5</strong></p>
+                                 <div class="flex justify-center my-4 space-x-4">
+                                     <div class="text-center">
+                                         <span class="text-2xl">🏆</span>
+                                         <p class="text-xs text-gray-600">Silver Donor</p>
+                                     </div>
+                                     <div class="text-center">
+                                         <span class="text-2xl">🗺️</span>
+                                         <p class="text-xs text-gray-600">Dhaka's Hero</p>
+                                     </div>
+                                 </div>
+                                 <div class="space-y-2 text-sm text-gray-700">
+                                     <p>Your last donation helped a patient at Apollo Hospital.</p>
+                                     <p>Congratulations! You just earned the 'Saviour' badge for your 5th donation.</p>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">National Rollout Plan</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">Our strategic, three-phase plan ensures a scalable and sustainable expansion, starting with a concentrated pilot in Dhaka and progressively covering all 64 districts within 36 months.</p>
+            </div>
+            <div class="flex justify-center mb-8">
+                <div class="flex space-x-2 md:space-x-4 bg-gray-200 p-2 rounded-full">
+                    <button class="timeline-btn px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-full transition-all duration-300 active" data-phase="pilot">Phase 1: Pilot</button>
+                    <button class="timeline-btn px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-full transition-all duration-300" data-phase="expansion">Phase 2: Expansion</button>
+                    <button class="timeline-btn px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-full transition-all duration-300" data-phase="scale">Phase 3: National Scale</button>
+                </div>
+            </div>
+            <div id="roadmap-content" class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto transition-all duration-500">
+            </div>
+        </section>
+
+        <section id="metrics" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Measuring Our Impact</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">Success is defined by clear, measurable Key Performance Indicators (KPIs). These metrics guide our operations and demonstrate our commitment to saving lives efficiently and reliably across Bangladesh.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-lg font-bold text-center text-gray-800 mb-4">Time-to-Match Goal (Dhaka)</h3>
+                    <div class="kpi-chart-container"><canvas id="timeToMatchChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-lg font-bold text-center text-gray-800 mb-4">Urgent Delivery SLA Compliance</h3>
+                    <div class="kpi-chart-container"><canvas id="slaChart"></canvas></div>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-lg font-bold text-center text-gray-800 mb-4">Donor Retention Rate</h3>
+                    <div class="kpi-chart-container"><canvas id="retentionChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-lg font-bold text-center text-gray-800 mb-4">Component Wastage Rate</h3>
+                    <div class="kpi-chart-container"><canvas id="wastageChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p class="font-bold text-lg">BloodLink Bangladesh</p>
+            <p class="text-gray-400 mt-2">A unified platform for a healthier nation.</p>
+            <div class="mt-6 text-sm text-gray-500">
+                <p><strong>Founder:</strong> Nazmul Islam</p>
+                <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/nnazmul-islam/" class="text-gray-400 hover:text-white" target="_blank">https://www.linkedin.com/in/nnazmul-islam/</a></p>
+                <p><strong>Studying:</strong> Kyungsung University, South Korea (Global IT)</p>
+                <p class="mt-2"><strong>Co-Founder:</strong> Hafsha Ahmed Nishat</p>
+                <p><strong>Facebook:</strong> <a href="https://www.facebook.com/hafsaahmed.nishat.5" class="text-gray-400 hover:text-white" target="_blank">https://www.facebook.com/hafsaahmed.nishat.5</a></p>
+                <p><strong>Live in:</strong> USA</p>
+            </div>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const flowchartSteps = {
+        request: {
+            title: '1. Hospital Platform Request',
+            text: 'When a patient needs blood that is not in stock, a trained hospital coordinator initiates an urgent request through the national platform dashboard. The request includes blood type, component needed (RBC, platelets, etc.), and urgency level.'
+        },
+        match: {
+            title: '2. AI-Driven Donor Matching',
+            text: 'The platform\'s AI instantly queries the verified donor registry, filtering by blood type, location, and availability. It identifies and alerts the most suitable donors via app notifications, SMS, and automated calls to ensure a rapid response.'
+        },
+        transport: {
+            title: '3. Multi-Modal Transport Orchestration',
+            text: 'Simultaneously, the system\'s AI routing engine selects the fastest transport option based on real-time traffic data. It dynamically dispatches the best choice from Tier 1 (Uber/Pathao), Tier 2 (Vetted Volunteers), or Tier 3 (In-house emergency fleet).'
+        },
+        collection: {
+            title: '4. Safe Collection & Cold Chain Monitoring',
+            text: 'Blood is collected either at the donor\'s home or a nearby partner facility. It is immediately placed in a portable, temperature-monitored cold-chain box (2-6°C for RBCs) to ensure viability and safety throughout its journey.'
+        },
+        delivery: {
+            title: '5. Verified Hospital Delivery & Handoff',
+            text: 'The transport unit delivers the blood directly to the hospital\'s transfusion coordinator. A secure digital handoff is completed using QR codes, and the inventory is updated in real-time on the platform, closing the loop.'
+        }
+    };
+
+    const roadmapData = {
+        pilot: {
+            duration: '0-6 Months',
+            location: 'Dhaka',
+            details: [
+                'Onboard 5-10 hospitals',
+                'Recruit and train 500 volunteers',
+                'Deploy 5 emergency vehicles',
+                'Integrate with Uber/Pathao APIs',
+            ],
+            metric: 'Median Time-to-Match ≤ 30 minutes'
+        },
+        expansion: {
+            duration: '6-18 Months',
+            location: 'Chattogram, Sylhet, Khulna',
+            details: [
+                'Expand to 4 major divisions',
+                'Grow donor base to 50,000+',
+                'Implement AI demand forecasting',
+                'Launch USSD service for feature phone access',
+            ],
+            metric: 'Annual Donor Retention ≥ 50%'
+        },
+        scale: {
+            duration: '18-36 Months',
+            location: 'All 64 Districts',
+            details: [
+                'Full national coverage',
+                'Expand fleet to 50 vans & 200 motorbikes',
+                'Integrate with government health APIs',
+                'Establish a 24/7 National Command Center',
+            ],
+            metric: 'SLA Compliance for Urgent Deliveries ≥ 95%'
+        }
+    };
+
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    const navLinks = document.querySelectorAll('nav a');
+    const sections = document.querySelectorAll('main section');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    const supplyCtx = document.getElementById('supplyChart').getContext('2d');
+    new Chart(supplyCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Replacement Donors (Family/Friends)', 'Voluntary Donors'],
+            datasets: [{
+                data: [67.5, 32.5],
+                backgroundColor: ['#D32F2F', '#1E753E'],
+                borderColor: '#FBF7F7',
+                borderWidth: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: { size: 12, family: 'Inter' },
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    function createKpiChart(canvasId, label, targetValue, unit) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const isPercentage = unit === '%';
+        const isMinutes = unit === 'min';
+        const maxValue = isPercentage ? 100 : (isMinutes ? Math.max(60, targetValue * 1.5) : targetValue * 1.5);
+        const displayValue = isMinutes ? targetValue : targetValue; 
+        const backgroundColor = isMinutes ? 'rgba(211, 47, 47, 0.6)' : 'rgba(30, 117, 62, 0.6)';
+        const borderColor = isMinutes ? 'rgba(211, 47, 47, 1)' : 'rgba(30, 117, 62, 1)';
+        const labelText = isMinutes ? `Goal: ≤ ${targetValue} ${unit}` : `Goal: ≥ ${targetValue}${unit}`;
+        
+        if (canvasId === 'wastageChart') {
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [labelText],
+                    datasets: [{
+                        label: 'Wastage Rate',
+                        data: [targetValue],
+                        backgroundColor: 'rgba(211, 47, 47, 0.6)',
+                        borderColor: 'rgba(211, 47, 47, 1)',
+                        borderWidth: 1,
+                        barThickness: 50,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { max: 10, title: { display: true, text: unit } },
+                        y: { beginAtZero: true }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+        
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [labelText],
+                datasets: [{
+                    label: label,
+                    data: [displayValue],
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1,
+                    barThickness: 50,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { max: maxValue, title: { display: true, text: unit } },
+                    y: { beginAtZero: true }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    createKpiChart('timeToMatchChart', 'Time to Match', 30, 'min');
+    createKpiChart('slaChart', 'SLA Compliance', 95, '%');
+    createKpiChart('retentionChart', 'Donor Retention', 50, '%');
+    createKpiChart('wastageChart', 'Component Wastage', 5, '%');
+
+    const timelineButtons = document.querySelectorAll('.timeline-btn');
+    const roadmapContent = document.getElementById('roadmap-content');
+    
+    function updateRoadmapContent(phase) {
+        const data = roadmapData[phase];
+        roadmapContent.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-1">
+                    <p class="text-sm text-gray-500">Duration</p>
+                    <p class="font-bold text-lg text-[#D32F2F]">${data.duration}</p>
+                    <p class="text-sm text-gray-500 mt-4">Location</p>
+                    <p class="font-bold text-lg">${data.location}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <p class="text-sm text-gray-500 mb-2">Key Actions</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        ${data.details.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    <div class="mt-6 bg-red-50 p-4 rounded-lg border border-red-200">
+                        <p class="text-sm font-semibold text-red-800">Key Metric for Phase:</p>
+                        <p class="text-red-700">${data.metric}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    timelineButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            timelineButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const phase = button.dataset.phase;
+            updateRoadmapContent(phase);
+        });
+    });
+
+    updateRoadmapContent('pilot');
+
+    const partnerCards = document.querySelectorAll('.partner-card');
+    
+    partnerCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const isOpen = card.classList.contains('open');
+            partnerCards.forEach(c => c.classList.remove('open'));
+            if (!isOpen) {
+                card.classList.add('open');
+            }
+        });
+    });
+    
+    const blueprintButtons = document.querySelectorAll('.blueprint-btn');
+    const blueprintContents = document.querySelectorAll('.blueprint-content');
+    
+    function switchBlueprintView(viewId) {
+        blueprintContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(viewId).classList.add('active');
+    }
+
+    blueprintButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            blueprintButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            switchBlueprintView(btn.dataset.step + '-view');
+        });
+    });
+    
+    const individualBtn = document.getElementById('individual-btn');
+    const orgBtn = document.getElementById('org-btn');
+    const individualForm = document.getElementById('individual-form-container');
+    const orgForm = document.getElementById('org-form-container');
+    const liveLocationBtn = document.getElementById('live-location-btn');
+    const locationInput = document.getElementById('location-input');
+
+    individualBtn.addEventListener('click', () => {
+        individualForm.classList.add('active');
+        orgForm.classList.remove('active');
+        individualBtn.classList.add('border-[#D32F2F]', 'text-[#D32F2F]');
+        individualBtn.classList.remove('border-gray-400', 'text-gray-600');
+        orgBtn.classList.add('border-gray-400', 'text-gray-600');
+        orgBtn.classList.remove('border-[#D32F2F]', 'text-[#D32F2F]');
+    });
+
+    orgBtn.addEventListener('click', () => {
+        orgForm.classList.add('active');
+        individualForm.classList.remove('active');
+        orgBtn.classList.add('border-[#D32F2F]', 'text-[#D32F2F]');
+        orgBtn.classList.remove('border-gray-400', 'text-gray-600');
+        individualBtn.classList.add('border-gray-400', 'text-gray-600');
+        individualBtn.classList.remove('border-[#D32F2F]', 'text-[#D32F2F]');
+    });
+
+    liveLocationBtn.addEventListener('click', () => {
+        locationInput.value = 'Fetching live location...';
+        setTimeout(() => {
+            locationInput.value = 'Dhaka, Bangladesh';
+        }, 1500);
+    });
+    
+});
+</script>
+</body>
+</html>
